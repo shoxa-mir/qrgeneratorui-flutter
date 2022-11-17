@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1056788178239",
+    "project_id": "qrgenerator-eonify",
+    "storage_bucket": "qrgenerator-eonify.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1056788178239:android:8510d5bd7db41833e49f8a",
+        "android_client_info": {
+          "package_name": "com.eonify.qrgeneratorui"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1056788178239-jfohp5nu2fpmie7ojrcdcn2ifvbd5trc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAH8BeuQ15-ggt0fTCkC3FcE9UcaFQuwgA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1056788178239-jfohp5nu2fpmie7ojrcdcn2ifvbd5trc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
