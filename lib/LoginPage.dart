@@ -18,6 +18,7 @@ class LoginPage extends StatefulWidget {
 class LoginState extends State<LoginPage> {
   late TextEditingController _emailInput;
   late TextEditingController _passwordInput;
+  String? message;
 
   @override
   void initState() {
@@ -99,6 +100,10 @@ class LoginState extends State<LoginPage> {
                               color: Colors.deepPurpleAccent, fontSize: 15),
                         ),
                       ),
+                      hintMessage(message),
+                      SizedBox(
+                        height: 10,
+                      ),
                       Container(
                         height: 50,
                         width: 250,
@@ -109,10 +114,19 @@ class LoginState extends State<LoginPage> {
                           onPressed: () async {
                             final email = _emailInput.text;
                             final password = _passwordInput.text;
-                            FirebaseAuth.instance.signInWithEmailAndPassword(
-                                email: email, password: password);
-                            Navigator.push(context,
-                                MaterialPageRoute(builder: (_) => HomePage()));
+                            try {
+                              await FirebaseAuth.instance
+                                  .signInWithEmailAndPassword(
+                                      email: email, password: password);
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (_) => HomePage()));
+                            } catch (e) {
+                              setState(() {
+                                message = "Invalid email or password";
+                              });
+                            }
                           },
                           child: const Text(
                             'Login',
@@ -155,5 +169,16 @@ class LoginState extends State<LoginPage> {
             }
           }),
     );
+  }
+
+  Widget hintMessage(String? message) {
+    if (message != null) {
+      return Text(
+        message,
+        style: TextStyle(color: Colors.red, fontSize: 15),
+      );
+    } else {
+      return Text(" ");
+    }
   }
 }
