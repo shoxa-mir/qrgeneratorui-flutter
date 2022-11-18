@@ -7,9 +7,11 @@ import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:qrgeneratorui/LoginPage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:qrgeneratorui/QrShowPage.dart';
+import 'package:qrgeneratorui/ad_helper.dart';
 import 'package:qrgeneratorui/firebase_options.dart';
 
 class HomePage extends StatefulWidget {
@@ -21,6 +23,7 @@ class HomePage extends StatefulWidget {
 
 class HomePageState extends State<HomePage> {
   var urlController = TextEditingController();
+  BannerAd? _bannerAd;
   late bool userLogged = false;
   String _fileText = "";
   static late String url;
@@ -28,12 +31,29 @@ class HomePageState extends State<HomePage> {
 
   @override
   void dispose() {
+    _bannerAd?.dispose();
     urlController.dispose();
     super.dispose();
   }
 
   @override
   void initState() {
+    BannerAd(
+      adUnitId: AdHelper.bannerAdUnitId,
+      request: AdRequest(),
+      size: AdSize.banner,
+      listener: BannerAdListener(
+        onAdLoaded: (ad) {
+          setState(() {
+            _bannerAd = ad as BannerAd;
+          });
+        },
+        onAdFailedToLoad: (ad, err) {
+          print('Failed to load a banner ad: ${err.message}');
+          ad.dispose();
+        },
+      ),
+    ).load();
     message = null;
     urlController = TextEditingController();
     super.initState();
@@ -141,6 +161,15 @@ class HomePageState extends State<HomePage> {
                             height: 150,
                           ),
                           logoutButton(),
+                          if (_bannerAd != null)
+                            Align(
+                              alignment: Alignment.topCenter,
+                              child: Container(
+                                width: _bannerAd!.size.width.toDouble(),
+                                height: _bannerAd!.size.height.toDouble(),
+                                child: AdWidget(ad: _bannerAd!),
+                              ),
+                            ),
                         ],
                       ),
                     );
@@ -173,7 +202,7 @@ class HomePageState extends State<HomePage> {
       return Align(
         alignment: Alignment.bottomRight,
         child: Container(
-          height: 40,
+          height: 30,
           width: 150,
           decoration: BoxDecoration(
               color: Colors.white, borderRadius: BorderRadius.circular(30)),
@@ -208,7 +237,12 @@ class HomePageState extends State<HomePage> {
         ),
       );
     } else {
-      return const Align();
+      return Align(
+        alignment: Alignment.bottomCenter,
+        child: Container(
+          height: 40,
+        ),
+      );
     }
   }
 

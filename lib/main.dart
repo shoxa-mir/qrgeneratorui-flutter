@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:qrgeneratorui/HomePage.dart';
 import 'package:flutter/services.dart';
 
@@ -15,9 +16,17 @@ class QrGeneratorApp extends StatelessWidget {
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: HomePage(),
-    );
+    return FutureBuilder(
+        future: init_admob(),
+        builder: (context, snapshot) {
+          return const MaterialApp(
+            debugShowCheckedModeBanner: false,
+            home: HomePage(),
+          );
+        });
+  }
+
+  Future<InitializationStatus> init_admob() {
+    return MobileAds.instance.initialize();
   }
 }
