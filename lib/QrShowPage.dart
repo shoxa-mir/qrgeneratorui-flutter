@@ -61,7 +61,7 @@ class QrShowState extends State<QrShowPage> {
                       embeddedImage:
                           Image.asset('assets/qrgenerator.png').image,
                       embeddedImageStyle:
-                          QrEmbeddedImageStyle(size: Size(30, 30), color: Colors.black),
+                          QrEmbeddedImageStyle(size: Size(30, 30)),
                     ),
                   ),
                 ),

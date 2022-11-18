@@ -24,15 +24,18 @@ class HomePage extends StatefulWidget {
 class HomePageState extends State<HomePage> {
   var urlController = TextEditingController();
   BannerAd? _bannerAd;
+  RewardedAd? _rewardedAd;
   late bool userLogged = false;
   String _fileText = "";
   static late String url;
   late String? message;
+  int counter = 5;
 
   @override
   void dispose() {
     _bannerAd?.dispose();
     urlController.dispose();
+    _rewardedAd?.dispose();
     super.dispose();
   }
 
@@ -54,6 +57,7 @@ class HomePageState extends State<HomePage> {
         },
       ),
     ).load();
+    _loadRewardedAd();
     message = null;
     urlController = TextEditingController();
     super.initState();
@@ -130,17 +134,31 @@ class HomePageState extends State<HomePage> {
                               onPressed: () async {
                                 url = urlController.text;
                                 if (url.length > 1 || _fileText.length > 1) {
-                                  log("[DEBUG] User logged in $userLogged");
-                                  if (kDebugMode) {
-                                    print("User logged in $userLogged");
-                                  }
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (_) => const QrShowPage()));
-                                  if (kDebugMode) {
-                                    print(_fileText);
-                                    print("Generate");
+                                  if (counter > 0) {
+                                    setState(() {
+                                      counter--;
+                                    });
+                                    print(counter.toString());
+                                    log("[DEBUG] User logged in $userLogged");
+                                    if (kDebugMode) {
+                                      print("User logged in $userLogged");
+                                    }
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (_) =>
+                                                const QrShowPage()));
+                                    if (kDebugMode) {
+                                      print(_fileText);
+                                      print("Generate");
+                                    }
+                                  } else {
+                                    _rewardedAd?.show(
+                                        onUserEarnedReward: (_, reward) {
+                                      setState(() {
+                                        counter = 5;
+                                      });
+                                    });
                                   }
                                 } else {
                                   setState(() {
@@ -156,6 +174,9 @@ class HomePageState extends State<HomePage> {
                               ),
                             ),
                           ),
+                          Padding(
+                              padding: EdgeInsets.only(top: 10),
+                              child: Text("$counter free attempts left")),
                           loginHint(),
                           const SizedBox(
                             height: 150,
@@ -319,5 +340,32 @@ class HomePageState extends State<HomePage> {
             ),
           ));
     }
+  }
+
+  void _loadRewardedAd() {
+    RewardedAd.load(
+      adUnitId: AdHelper.rewardedAdUnitId,
+      request: AdRequest(),
+      rewardedAdLoadCallback: RewardedAdLoadCallback(
+        onAdLoaded: (ad) {
+          ad.fullScreenContentCallback = FullScreenContentCallback(
+            onAdDismissedFullScreenContent: (ad) {
+              setState(() {
+                ad.dispose();
+                _rewardedAd = null;
+              });
+              _loadRewardedAd();
+            },
+          );
+
+          setState(() {
+            _rewardedAd = ad;
+          });
+        },
+        onAdFailedToLoad: (err) {
+          print('Failed to load a rewarded ad: ${err.message}');
+        },
+      ),
+    );
   }
 }
